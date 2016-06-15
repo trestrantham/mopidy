@@ -5,7 +5,7 @@ defmodule Mopidy.Mixfile do
     [
       app: :mopidy,
       version: "0.0.1",
-      elixir: "~> 1.2",
+      elixir: "~> 1.3",
       description: "A Mopidy Library for Elixir",
       package: package,
       build_embedded: Mix.env == :prod,
