@@ -1,26 +1,20 @@
 defmodule Mopidy.Playback do
   alias Mopidy.{TlTrack,Track}
 
-  def current_track do
-    data = %{method: "core.playback.get_current_track"}
-
-    Mopidy.api_request(data)
-  end
-
   def get_current_tl_track do
-    data = %{method: "core.playbook.get_current_tl_track"}
+    data = %{method: "core.playback.get_current_tl_track"}
 
     Mopidy.api_request(data, %TlTrack{})
   end
 
   def get_current_tlid do
-    data = %{method: "core.playbook.get_current_tlid"}
+    data = %{method: "core.playback.get_current_tlid"}
 
     Mopidy.api_request(data, :result)
   end
 
   def get_current_track do
-    data = %{method: "core.playbook.get_current_track"}
+    data = %{method: "core.playback.get_current_track"}
 
     Mopidy.api_request(data, %Track{})
   end
