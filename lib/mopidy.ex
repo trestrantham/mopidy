@@ -36,10 +36,22 @@ defmodule Mopidy.TlTrack do
   }
 end
 
+defmodule Mopidy.Ref do
+  defstruct name: nil, type: nil, uri: nil
+
+  @type t :: %__MODULE__{
+    name: binary,
+    type: binary,
+    uri: binary
+  }
+end
+
 defmodule Mopidy do
   @moduledoc """
   An HTTP client for Mopidy
   """
+
+  alias Mopidy.{Album,Artist,Track,TlTrack,Ref}
 
   use Application
   use HTTPotion.Base
