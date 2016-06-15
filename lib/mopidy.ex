@@ -85,9 +85,8 @@ defmodule Mopidy do
   """
   def api_request(data \\ %{}) do
     body = Map.merge(%{id: "1", jsonrpc: "2.0"}, data)
-    response = Mopidy.post nil, [body: body]
 
-    with %HTTPotion.Response{body: body} <- response do
+    with %HTTPotion.Response{body: body} <- Mopidy.post(nil, [body: body]) do
       {:ok, body}
     else
       %HTTPotion.ErrorResponse{message: message} -> {:error, message}
