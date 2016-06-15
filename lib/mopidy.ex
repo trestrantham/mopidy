@@ -132,6 +132,12 @@ defmodule Mopidy do
 
   # List parsing
   def parse_data(_data_type, nil, _accumulator), do: nil
+  def parse_data(%Ref{} = data_type, [timestamp, %{"__model__" => "Ref"} = datum_data], _accumulator) when is_integer(timestamp) do
+    %{
+      timestamp: timestamp,
+      ref: parse_data(data_type, datum_data, [])
+    }
+  end
   def parse_data(data_type, [head | tail], accumulator) when is_list(accumulator) do
     parse_data(data_type, tail, [parse_data(data_type, head, [])] ++ accumulator)
   end
