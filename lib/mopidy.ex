@@ -1,3 +1,41 @@
+defmodule Mopidy.Album do
+  defstruct uri: nil, name: nil
+
+  @type t :: %__MODULE__{
+    uri: binary,
+    name: binary
+  }
+end
+
+defmodule Mopidy.Artist do
+  defstruct uri: nil, name: nil
+
+  @type t :: %__MODULE__{
+    uri: binary,
+    name: binary
+  }
+end
+
+defmodule Mopidy.Track do
+  defstruct uri: nil, name: nil, album: nil, artists: []
+
+  @type t :: %__MODULE__{
+    uri: binary,
+    name: binary,
+    album: %Mopidy.Album{},
+    artists: List
+  }
+end
+
+defmodule Mopidy.TlTrack do
+  defstruct tlid: nil, track: %Mopidy.Track{}
+
+  @type t :: %__MODULE__{
+    tlid: integer,
+    track: %Mopidy.Track{}
+  }
+end
+
 defmodule Mopidy do
   @moduledoc """
   An HTTP client for Mopidy
