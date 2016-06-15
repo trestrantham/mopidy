@@ -14,9 +14,8 @@ defmodule Mopidy.Library do
     data = %{
       method: "core.library.get_distinct",
       params: %{
-        query: query,
-        uris: uris,
-        exact: false
+        field: field,
+        query: query
       }
     }
 
