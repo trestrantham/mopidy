@@ -108,99 +108,70 @@ defmodule Mopidy do
   end
 
   def api_request(data, data_type) do
-    case Mopidy.api_request(data) do
-      {:ok, %{"error" => error} = body} ->
-        error_response(body)
-      {:ok, body} ->
-        case data_type do
-          %Mopidy.TlTrack{} ->
-            {:ok, parse_tl_tracks(body["result"], [])}
-          %Mopidy.Track{} ->
-            {:ok, parse_tracks(body["result"], [])}
-          :result ->
-            {:ok, body["result"]}
-          :success ->
-            {:ok, :success}
-          _ ->
-            {:ok, body["value"]}
-        end
-      error ->
-        error_response(error)
+    with {:ok, body} <- Mopidy.api_request(data),
+         {:ok, body} <- parse_data(data_type, body) do
+        {:ok, body}
+    else
+      {:error, %{"error" => %{"data" => %{"message" => message}}}} ->
+        {:error, message}
+      {:error, %{"error" => %{"message" => message}}} ->
+        {:error, message}
+      {:error, message} ->
+        {:error, message}
+      _ ->
+        {:error, "invalid response"}
     end
   end
 
-  def error_response(%{"error" => %{"data" => %{"message" => message}}}) do
-    {:error, message}
-  end
-  def error_response(%{"error" => %{"message" => message}}) do
-    {:error, message}
-  end
-  def error_response({:error, message}), do: {:error, message}
-  def error_response(message) when is_binary(message) do
-    {:error, message}
-  end
-  def error_response(_) do
-    {:error, "invalid response"}
-  end
+  # Entry points
+  def parse_data(_data_type, %{"error" => _error} = body), do: {:error, body}
+  def parse_data(:success, _body), do: {:ok, :success}
+  def parse_data(:value, body), do: {:ok, body["value"]}
+  def parse_data(:result, body), do: {:ok, body["result"]}
+  def parse_data(data_type, body), do: {:ok, parse_data(data_type, body["result"], [])}
 
-  # TlTrack parsing
-  def parse_tl_tracks(nil, _accumulator), do: nil
-  def parse_tl_tracks([tl_track | tl_tracks], accumulator) when is_list(accumulator) do
-    parse_tl_tracks(tl_tracks, [parse_tl_track(tl_track)] ++ accumulator)
+  # List parsing
+  def parse_data(_data_type, nil, _accumulator), do: nil
+  def parse_data(data_type, [head | tail], accumulator) when is_list(accumulator) do
+    parse_data(data_type, tail, [parse_data(data_type, head, [])] ++ accumulator)
   end
-  def parse_tl_tracks(%{"__model__" => "TlTrack"} = tl_track_data, _accumulator) do
-    parse_tl_track(tl_track_data)
-  end
-  def parse_tl_tracks([], accumulator), do: accumulator
+  def parse_data(_data_type, [], accumulator), do: accumulator
 
-  def parse_tl_track(%{"__model__" => "TlTrack"} = tl_track_data) do
-    %Mopidy.TlTrack{
-      tlid: tl_track_data["tlid"],
-      track: parse_track(tl_track_data["track"])
+  # Model parsing
+  def parse_data(%TlTrack{}, %{"__model__" => "TlTrack"} = datum_data, _accumulator) do
+    %TlTrack{
+      tlid: datum_data["tlid"],
+      track: parse_data(%Track{}, datum_data["track"])
     }
   end
-  def parse_tl_track(_), do: nil
-
-  # Track parsing
-  def parse_tracks(nil, _accumulator), do: nil
-  def parse_tracks([track | tracks], accumulator) when is_list(accumulator) do
-    parse_tracks(tracks, [parse_track(track)] ++ accumulator)
-  end
-  def parse_tracks(%{"__model__" => "Track"} = track_data, _accumulator) do
-    parse_track(track_data)
-  end
-  def parse_tracks([], accumulator), do: accumulator
-
-  def parse_track(%{"__model__" => "Track"} = track_data) do
-    %Mopidy.Track{
-      name: track_data["name"],
-      uri: track_data["uri"],
-      album: parse_album(track_data["album"]),
-      artists: parse_artists(track_data["artists"], [])
+  def parse_data(%Track{}, %{"__model__" => "Track"} = datum_data, _accumulator) do
+    %Track{
+      name: datum_data["name"],
+      uri: datum_data["uri"],
+      album: parse_data(%Album{}, datum_data["album"], []),
+      artists: parse_data(%Artist{}, datum_data["artists"], [])
     }
   end
-  def parse_track(_), do: nil
-
-  # Artist parsing
-  def parse_artists([artist | artists], accumulator) when is_list(accumulator) do
-    parse_artists(artists, [parse_artist(artist)] ++ accumulator)
-  end
-  def parse_artists([], accumulator), do: accumulator
-
-  def parse_artist(%{"__model__" => "Artist"} = artist_data) do
-    %Mopidy.Artist{
-      name: artist_data["name"],
-      uri: artist_data["uri"]
+  def parse_data(%Artist{}, %{"__model__" => "Artist"} = datum_data, _accumulator) do
+    %Artist{
+      name: datum_data["name"],
+      uri: datum_data["uri"]
     }
   end
-
-  # Album parsing
-  def parse_album(%{"__model__" => "Album"} = album_data) do
-    %Mopidy.Album{
-      name: album_data["name"],
-      uri: album_data["uri"]
+  def parse_data(%Album{}, %{"__model__" => "Album"} = datum_data, _accumulator) do
+    %Album{
+      name: datum_data["name"],
+      uri: datum_data["uri"]
     }
   end
+  def parse_data(%Ref{}, %{"__model__" => "Ref"} = datum_data, _accumulator) do
+    %Ref{
+      name: datum_data["name"],
+      type: datum_data["type"],
+      uri: datum_data["uri"]
+    }
+  end
+  def parse_data(_, _, _), do: nil
 
   @doc """
   Gets the API URL from :mopidy, :api_url application env or ENV
