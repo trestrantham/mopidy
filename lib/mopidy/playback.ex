@@ -49,14 +49,27 @@ defmodule Mopidy.Playback do
     Mopidy.api_request(data, :success)
   end
 
-  def play(tlid \\ nil) do
+  def play(%TlTrack{} = tl_track) do
     data = %{
       method: "core.playback.play",
-      tlid: tlid
+      params: %{
+        tl_track: tl_track
+      }
     }
 
     Mopidy.api_request(data, :success)
   end
+  def play(tlid) when is_integer(tlid) do
+    data = %{
+      method: "core.playback.play",
+      params: %{
+        tlid: tlid
+      }
+    }
+
+    Mopidy.api_request(data, :success)
+  end
+  def play(_ \\ nil), do: play(%TlTrack{})
 
   def previous do
     data = %{method: "core.playback.previous"}

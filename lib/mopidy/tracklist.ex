@@ -1,11 +1,12 @@
 defmodule Mopidy.Tracklist do
   alias Mopidy.{TlTrack,Track}
 
-  def add(uris \\ nil) do
+  def add(uris, at_position \\ nil) do
     data = %{
       method: "core.tracklist.add",
       params: %{
-        uris: uris
+        uris: uris,
+        at_position: at_position
       }
     }
 
@@ -18,16 +19,28 @@ defmodule Mopidy.Tracklist do
     Mopidy.api_request(data, :success)
   end
 
-  def eot_track do
+  @doc """
+  The track that will be played after the given `%Mopidy.TlTrack{}`
+
+  Returns `:ok` and the `%Mopidy.TlTrack{}` or `nil`
+
+  ## Examples
+
+    iex> Mopidy.Tracklist.eot_track
+    {:ok, %Mopidy.TlTrack{}}
+
+  """
+  def eot_track(%TlTrack{} = tl_track) do
     data = %{
       method: "core.tracklist.eot_track",
       params: %{
-        tl_track: nil
+        tl_track: tl_track
       }
     }
 
     Mopidy.api_request(data, %TlTrack{})
   end
+  def eot_track(_ \\ nil), do: eot_track(%TlTrack{})
 
   def filter(criteria \\ %{}) do
     data = %{
@@ -106,7 +119,31 @@ defmodule Mopidy.Tracklist do
     Mopidy.api_request(data, :result)
   end
 
-  def index(tlid) do
+  @doc """
+  The position of the given track in the tracklist.
+
+  If neither *tl_track* or *tlid* is given we return the index of the currently
+  playing track.
+
+  Returns `:ok` and the `%Mopidy.TlTrack{}` or `nil`
+
+  ## Examples
+
+    iex> Mopidy.Tracklist.index(%Mopidy.TlTrack{})
+    {:ok, 3}
+
+  """
+  def index(%TlTrack{} = tl_track) do
+    data = %{
+      method: "core.tracklist.index",
+      params: %{
+        tl_track: tl_track
+      }
+    }
+
+    Mopidy.api_request(data, :result)
+  end
+  def index(tlid) when is_integer(tlid) do
     data = %{
       method: "core.tracklist.index",
       params: %{
@@ -116,6 +153,7 @@ defmodule Mopidy.Tracklist do
 
     Mopidy.api_request(data, :result)
   end
+  def index(_ \\ nil), do: index(%TlTrack{})
 
   def move(start_position, end_position, to_position) do
     data = %{
@@ -130,7 +168,18 @@ defmodule Mopidy.Tracklist do
     Mopidy.api_request(data, :success)
   end
 
-  def next_track(tl_track \\ %TlTrack{}) do
+  @doc """
+  The track that will be played if calling `Mopidy.Playback.next`
+
+  Returns `:ok` and the next `%Mopidy.TlTrack{}` or `nil`
+
+  ## Examples
+
+    iex> Mopidy.Tracklist.next_track
+    {:ok, %Mopidy.TlTrack{}}
+
+  """
+  def next_track(%TlTrack{} = tl_track) do
     data = %{
       method: "core.tracklist.next_track",
       params: %{
@@ -140,8 +189,20 @@ defmodule Mopidy.Tracklist do
 
     Mopidy.api_request(data, %TlTrack{})
   end
+  def next_track(_ \\ nil), do: next_track(%TlTrack{})
 
-  def previous_track(tl_track \\ %TlTrack{}) do
+  @doc """
+  The track that will be played if calling `Mopidy.Playback.previous`
+
+  Returns `:ok` and the previous `%Mopidy.TlTrack{}` or `nil`
+
+  ## Examples
+
+    iex> Mopidy.Tracklist.previous_track
+    {:ok, %Mopidy.TlTrack{}}
+
+  """
+  def previous_track(%TlTrack{} = tl_track) do
     data = %{
       method: "core.tracklist.previous_track",
       params: %{
@@ -151,6 +212,7 @@ defmodule Mopidy.Tracklist do
 
     Mopidy.api_request(data, %TlTrack{})
   end
+  def previous_track(_ \\ nil), do: previous_track(%TlTrack{})
 
   def remove(criteria \\ %{}) do
     data = %{
