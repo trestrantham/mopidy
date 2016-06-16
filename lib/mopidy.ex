@@ -1,25 +1,28 @@
 defmodule Mopidy.Album do
-  defstruct uri: nil, name: nil
+  defstruct __model__: "Album", uri: nil, name: nil
 
   @type t :: %__MODULE__{
+    __model__: binary,
     uri: binary,
     name: binary
   }
 end
 
 defmodule Mopidy.Artist do
-  defstruct uri: nil, name: nil
+  defstruct __model__: "Artist", uri: nil, name: nil
 
   @type t :: %__MODULE__{
+    __model__: binary,
     uri: binary,
     name: binary
   }
 end
 
 defmodule Mopidy.Track do
-  defstruct uri: nil, name: nil, album: nil, artists: []
+  defstruct __model__: "Track", uri: nil, name: nil, album: nil, artists: []
 
   @type t :: %__MODULE__{
+    __model__: binary,
     uri: binary,
     name: binary,
     album: %Mopidy.Album{},
@@ -28,28 +31,31 @@ defmodule Mopidy.Track do
 end
 
 defmodule Mopidy.TlTrack do
-  defstruct tlid: nil, track: %Mopidy.Track{}
+  defstruct __model__: "TlTrack", tlid: nil, track: %Mopidy.Track{}
 
   @type t :: %__MODULE__{
+    __model__: binary,
     tlid: integer,
     track: %Mopidy.Track{}
   }
 end
 
 defmodule Mopidy.Ref do
-  defstruct name: nil, type: nil, uri: nil
+  defstruct __model__: "Ref", name: nil, type: nil, uri: nil
 
   @type t :: %__MODULE__{
     name: binary,
+    __model__: binary,
     type: binary,
     uri: binary
   }
 end
 
 defmodule Mopidy.Image do
-  defstruct uri: nil, width: nil, height: nil
+  defstruct __model__: "Image", uri: nil, width: nil, height: nil
 
   @type t :: %__MODULE__{
+    __model__: binary,
     uri: binary,
     width: integer,
     height: integer
@@ -57,9 +63,10 @@ defmodule Mopidy.Image do
 end
 
 defmodule Mopidy.SearchResult do
-  defstruct albums: [], artists: [], tracks: []
+  defstruct __model__: "SearchResult", albums: [], artists: [], tracks: []
 
   @type t :: %__MODULE__{
+    __model__: binary,
     albums: List,
     artists: List,
     tracks: List
