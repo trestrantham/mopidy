@@ -73,12 +73,22 @@ defmodule Mopidy.SearchResult do
   }
 end
 
+defmodule Mopidy.Playlist do
+  defstruct __model__: "Playlist", name: nil, uri: nil
+
+  @type t :: %__MODULE__{
+    __model__: binary,
+    name: binary,
+    uri: binary
+  }
+end
+
 defmodule Mopidy do
   @moduledoc """
   An HTTP client for Mopidy
   """
 
-  alias Mopidy.{Album,Artist,Track,TlTrack,Ref,Image,SearchResult}
+  alias Mopidy.{Album,Artist,Track,TlTrack,Ref,Image,SearchResult,Playlist}
 
   use Application
   use HTTPotion.Base
@@ -220,6 +230,12 @@ defmodule Mopidy do
       albums: parse_data(%Album{}, datum_data["albums"], []),
       artists: parse_data(%Artist{}, datum_data["artists"], []),
       tracks: parse_data(%Track{}, datum_data["tracks"], [])
+    }
+  end
+  def parse_data(%Playlist{}, %{"__model__" => "Playlist"} = datum_data, _accumulator) do
+    %Playlist{
+      name: datum_data["name"],
+      uri: datum_data["uri"]
     }
   end
   def parse_data(:uri, %{"__model__" => model_name} = datum_data, _accumulator) do
