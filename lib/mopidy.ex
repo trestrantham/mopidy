@@ -46,12 +46,32 @@ defmodule Mopidy.Ref do
   }
 end
 
+defmodule Mopidy.Image do
+  defstruct uri: nil, width: nil, height: nil
+
+  @type t :: %__MODULE__{
+    uri: binary,
+    width: integer,
+    height: integer
+  }
+end
+
+defmodule Mopidy.SearchResult do
+  defstruct albums: [], artists: [], tracks: []
+
+  @type t :: %__MODULE__{
+    albums: List,
+    artists: List,
+    tracks: List
+  }
+end
+
 defmodule Mopidy do
   @moduledoc """
   An HTTP client for Mopidy
   """
 
-  alias Mopidy.{Album,Artist,Track,TlTrack,Ref}
+  alias Mopidy.{Album,Artist,Track,TlTrack,Ref,Image,SearchResult}
 
   use Application
   use HTTPotion.Base
@@ -128,6 +148,7 @@ defmodule Mopidy do
   def parse_data(:success, _body), do: {:ok, :success}
   def parse_data(:value, body), do: {:ok, body["value"]}
   def parse_data(:result, body), do: {:ok, body["result"]}
+  def parse_data(:uri, body), do: {:ok, parse_data(:uri, body["result"], %{})}
   def parse_data(data_type, body), do: {:ok, parse_data(data_type, body["result"], [])}
 
   # List parsing
@@ -138,6 +159,9 @@ defmodule Mopidy do
       ref: parse_data(data_type, datum_data, [])
     }
   end
+  def parse_data(%SearchResult{} = data_type, [%{"__model__" => "SearchResult"} = datum_data], _accumulator) do
+    parse_data(data_type, datum_data, [])
+  end
   def parse_data(data_type, [head | tail], accumulator) when is_list(accumulator) do
     parse_data(data_type, tail, [parse_data(data_type, head, [])] ++ accumulator)
   end
@@ -147,7 +171,7 @@ defmodule Mopidy do
   def parse_data(%TlTrack{}, %{"__model__" => "TlTrack"} = datum_data, _accumulator) do
     %TlTrack{
       tlid: datum_data["tlid"],
-      track: parse_data(%Track{}, datum_data["track"])
+      track: parse_data(%Track{}, datum_data["track"], [])
     }
   end
   def parse_data(%Track{}, %{"__model__" => "Track"} = datum_data, _accumulator) do
@@ -176,6 +200,32 @@ defmodule Mopidy do
       type: datum_data["type"],
       uri: datum_data["uri"]
     }
+  end
+  def parse_data(%Image{}, %{"__model__" => "Image"} = datum_data, _accumulator) do
+    %Image{
+      uri: datum_data["uri"],
+      width: datum_data["width"],
+      height: datum_data["height"]
+    }
+  end
+  def parse_data(%SearchResult{}, %{"__model__" => "SearchResult"} = datum_data, _accumulator) do
+    %SearchResult{
+      albums: parse_data(%Album{}, datum_data["albums"], []),
+      artists: parse_data(%Artist{}, datum_data["artists"], []),
+      tracks: parse_data(%Track{}, datum_data["tracks"], [])
+    }
+  end
+  def parse_data(:uri, %{"__model__" => model_name} = datum_data, _accumulator) do
+    model_struct = Module.concat(Mopidy, model_name).__struct__
+    parse_data(model_struct, datum_data, [])
+  end
+  def parse_data(:uri = data_type, %{} = datum_data, _accumulator) do
+    datum_data
+    |> Map.keys
+    |> Enum.map(fn(key) ->
+      {key, parse_data(data_type, datum_data[key], [])}
+    end)
+    |> Enum.into(%{})
   end
   def parse_data(_, _, _), do: nil
 

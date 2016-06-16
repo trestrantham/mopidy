@@ -1,16 +1,18 @@
 defmodule Mopidy.Library do
-  def browse(uris \\ nil) do
+  alias Mopidy.{Ref,SearchResult}
+
+  def browse(uri \\ nil) do
     data = %{
       method: "core.library.browse",
       params: %{
-        uris: uris
+        uri: uri
       }
     }
 
-    Mopidy.api_request(data)
+    Mopidy.api_request(data, %Mopidy.Ref{})
   end
 
-  def get_distinct(field, query \\ nil) do
+  def get_distinct(field, query) do
     data = %{
       method: "core.library.get_distinct",
       params: %{
@@ -19,10 +21,10 @@ defmodule Mopidy.Library do
       }
     }
 
-    Mopidy.api_request(data)
+    Mopidy.api_request(data, :result)
   end
 
-  def get_images(uris \\ nil) do
+  def get_images(uris) do
     data = %{
       method: "core.library.get_images",
       params: %{
@@ -30,7 +32,7 @@ defmodule Mopidy.Library do
       }
     }
 
-    Mopidy.api_request(data)
+    Mopidy.api_request(data, :uri)
   end
 
   def lookup(uris \\ nil) do
@@ -41,30 +43,30 @@ defmodule Mopidy.Library do
       }
     }
 
-    Mopidy.api_request(data)
+    Mopidy.api_request(data, :uri)
   end
 
-  def refresh(uris \\ nil) do
+  def refresh(uri \\ nil) do
     data = %{
       method: "core.library.refresh",
       params: %{
-        uris: uris
+        uri: uri
       }
     }
 
-    Mopidy.api_request(data)
+    Mopidy.api_request(data, :success)
   end
 
-  def search(query, uris \\ nil) do
+  def search(query, uris, exact \\ true) do
     data = %{
       method: "core.library.search",
       params: %{
         query: query,
         uris: uris,
-        exact: false
+        exact: exact
       }
     }
 
-    Mopidy.api_request(data)
+    Mopidy.api_request(data, %SearchResult{})
   end
 end
