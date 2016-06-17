@@ -1,8 +1,4 @@
-# Mopidy [![Travis](https://img.shields.io/travis/trestrantham/mopidy.svg?maxAge=2592000&style=flat-square)]()
-[![Coveralls](https://img.shields.io/coveralls/jekyll/jekyll.svg?maxAge=2592000?style=flat-square)]()
-[![Hex.pm](https://img.shields.io/hexpm/v/mopidy.svg?maxAge=2592000&style=flat-square)]()
-[![Deps Status](https://beta.hexfaktor.org/badge/all/github/trestrantham/mopidy.svg)](https://beta.hexfaktor.org/github/trestrantham/mopidy)
-[![Inline docs](http://inch-ci.org/github/trestrantham/mopidy.svg?branch=master&style=shields)](http://inch-ci.org/github/trestrantham/mopidy)
+# Mopidy [![Travis](https://img.shields.io/travis/trestrantham/mopidy.svg?maxAge=2592000&style=flat-square)]() [![Coveralls](https://img.shields.io/coveralls/jekyll/jekyll.svg?maxAge=2592000&style=flat-square)]() [![Hex.pm](https://img.shields.io/hexpm/v/mopidy.svg?maxAge=2592000&style=flat-square)]() [![Deps Status](https://beta.hexfaktor.org/badge/all/github/trestrantham/mopidy.svg)](https://beta.hexfaktor.org/github/trestrantham/mopidy) [![Inline docs](http://inch-ci.org/github/trestrantham/mopidy.svg?branch=master&style=shields)](http://inch-ci.org/github/trestrantham/mopidy)
 
 A Mopidy client library for Elixir.
 
