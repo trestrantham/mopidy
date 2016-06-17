@@ -35,7 +35,7 @@ defmodule Mopidy.Mixfile do
       {:ex_doc, "~> 0.11", only: :dev},
       {:excoveralls, "~> 0.4", only: :test},
       {:httpotion, "~> 3.0.0"},
-      {:inch_ex, "~> 0.4", only: :dev},
+      {:inch_ex, "~> 0.4", only: :docs},
       {:mix_test_watch, "~> 0.2", only: :test},
       {:poison, "~> 2.1"}
     ]
