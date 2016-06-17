@@ -57,6 +57,7 @@ defmodule Mopidy.Library do
     Mopidy.api_request(data, :success)
   end
 
+  def search(query), do: search(query, nil)
   def search(query, uris, exact \\ true) do
     data = %{
       method: "core.library.search",
