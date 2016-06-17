@@ -93,6 +93,8 @@ defmodule Mopidy do
   use Application
   use HTTPotion.Base
 
+  @request_timeout 5_000
+
   def start(_type, _args) do
     start
     Mopidy.Supervisor.start_link
@@ -135,7 +137,7 @@ defmodule Mopidy do
   def api_request(data \\ %{}) do
     body = Map.merge(%{id: "1", jsonrpc: "2.0"}, data)
 
-    with %HTTPotion.Response{body: body} <- Mopidy.post(nil, [body: body]) do
+    with %HTTPotion.Response{body: body} <- Mopidy.post(nil, [body: body, timeout: mopidy_request_timeout]) do
       {:ok, body}
     else
       %HTTPotion.ErrorResponse{message: message} -> {:error, message}
@@ -258,5 +260,9 @@ defmodule Mopidy do
   """
   def mopidy_api_url do
     Application.get_env(:mopidy, :api_url)
+  end
+
+  def mopidy_request_timeout do
+    Application.get_env(:mopidy, :request_timeout) || @request_timeout
   end
 end
