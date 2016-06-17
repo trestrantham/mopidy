@@ -4,7 +4,7 @@ elixir:
 otp_release:
   - 18.0
 script:
-  - "MIX_ENV=test mix do deps.get, compile, coveralls.travis"
+  - "MIX_ENV=test mix do local.rebar --force, deps.get, compile, coveralls.travis"
 cache:
   directories:
     - _build
