@@ -253,11 +253,10 @@ defmodule Mopidy do
   def parse_data(_, _, _), do: nil
 
   @doc """
-  Gets the API URL from :mopidy, :api_url application env or ENV
+  Gets the API URL from :mopidy, :api_url application env
   Returns binary
   """
   def mopidy_api_url do
-    Application.get_env(:mopidy, :api_url) ||
-      System.get_env("MOPIDY_API_URL")
+    Application.get_env(:mopidy, :api_url)
   end
 end
