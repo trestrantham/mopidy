@@ -4,7 +4,7 @@ defmodule Mopidy.Mixfile do
   def project do
     [
       app: :mopidy,
-      version: "0.0.1",
+      version: "0.1",
       elixir: ">= 1.3.0-rc.1",
       deps: deps,
       description: description,
