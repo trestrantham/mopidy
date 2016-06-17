@@ -9,7 +9,7 @@ defmodule Mopidy.Library do
       }
     }
 
-    Mopidy.api_request(data, %Mopidy.Ref{})
+    Mopidy.api_request(data, %Ref{})
   end
 
   def get_distinct(field, query) do

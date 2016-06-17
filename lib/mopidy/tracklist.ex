@@ -40,7 +40,7 @@ defmodule Mopidy.Tracklist do
 
     Mopidy.api_request(data, %TlTrack{})
   end
-  def eot_track(_ \\ nil), do: eot_track(%TlTrack{})
+  def eot_track, do: eot_track(%TlTrack{})
 
   def filter(criteria \\ %{}) do
     data = %{
@@ -153,7 +153,7 @@ defmodule Mopidy.Tracklist do
 
     Mopidy.api_request(data, :result)
   end
-  def index(_ \\ nil), do: index(%TlTrack{})
+  def index, do: index(%TlTrack{})
 
   def move(start_position, end_position, to_position) do
     data = %{
@@ -189,7 +189,7 @@ defmodule Mopidy.Tracklist do
 
     Mopidy.api_request(data, %TlTrack{})
   end
-  def next_track(_ \\ nil), do: next_track(%TlTrack{})
+  def next_track, do: next_track(%TlTrack{})
 
   @doc """
   The track that will be played if calling `Mopidy.Playback.previous`
@@ -212,7 +212,7 @@ defmodule Mopidy.Tracklist do
 
     Mopidy.api_request(data, %TlTrack{})
   end
-  def previous_track(_ \\ nil), do: previous_track(%TlTrack{})
+  def previous_track, do: previous_track(%TlTrack{})
 
   def remove(criteria \\ %{}) do
     data = %{
