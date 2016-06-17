@@ -9,6 +9,8 @@ defmodule Mopidy.Mixfile do
       deps: deps,
       description: description,
       package: package,
+      build_embedded: Mix.env == :prod,
+      start_permanent: Mix.env == :prod,
       test_coverage: [tool: ExCoveralls],
       preferred_cli_env: [
         "coveralls": :test,

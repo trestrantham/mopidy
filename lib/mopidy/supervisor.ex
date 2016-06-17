@@ -6,8 +6,6 @@ defmodule Mopidy.Supervisor do
   end
 
   def init([]) do
-    children = []
-
-    supervise(children, strategy: :one_for_one)
+    supervise([], strategy: :one_for_one)
   end
 end
