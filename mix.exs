@@ -6,13 +6,16 @@ defmodule Mopidy.Mixfile do
       app: :mopidy,
       version: "0.0.1",
       elixir: ">= 1.3.0-rc.1",
+      deps: deps,
       description: description,
       package: package,
-      build_embedded: Mix.env == :prod,
-      start_permanent: Mix.env == :prod,
-      deps: deps(Mix.env),
       test_coverage: [tool: ExCoveralls],
-      preferred_cli_env: ["coveralls": :test, "coveralls.detail": :test, "coveralls.post": :test]
+      preferred_cli_env: [
+        "coveralls": :test,
+        "coveralls.detail": :test,
+        "coveralls.post": :test
+      ],
+      docs: [main: Mopidy]
     ]
   end
 
@@ -25,32 +28,29 @@ defmodule Mopidy.Mixfile do
     ]
   end
 
-  defp deps(:dev) do
-    deps(:prod)
-  end
-
-  defp deps(:test) do
-    deps(:dev)
-  end
-
-  defp deps(:prod) do
+  defp deps do
     [
+      {:credo, "~> 0.4", only: [:dev, :test]},
+      {:earmark, "~> 0.1", only: :docs},
+      {:ex_doc, "~> 0.11", only: :docs},
       {:excoveralls, "~> 0.4", only: :test},
       {:httpotion, "~> 3.0.0"},
-      {:mix_test_watch, "~> 0.2", only: :dev},
+      {:inch_ex, "~> 0.4", only: :docs},
+      {:mix_test_watch, "~> 0.2", only: :test},
       {:poison, "~> 2.1"}
     ]
   end
 
-  def package do
   defp description do
     """
     A Mopidy client library for Elixir
     """
   end
+
+  defp package do
     [
       maintainers: ["Tres Trantham"],
-      licenses: ["New BSD"],
+      licenses: ["MIT"],
       links: %{"GitHub" => "https://github.com/trestrantham/mopidy"}
     ]
   end
