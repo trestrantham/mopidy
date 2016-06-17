@@ -6,7 +6,7 @@ defmodule Mopidy.Mixfile do
       app: :mopidy,
       version: "0.0.1",
       elixir: "~> 1.3",
-      description: "A Mopidy Library for Elixir",
+      description: description,
       package: package,
       build_embedded: Mix.env == :prod,
       start_permanent: Mix.env == :prod,
@@ -43,6 +43,11 @@ defmodule Mopidy.Mixfile do
   end
 
   def package do
+  defp description do
+    """
+    A Mopidy client library for Elixir
+    """
+  end
     [
       maintainers: ["Tres Trantham"],
       licenses: ["New BSD"],
