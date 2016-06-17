@@ -31,11 +31,11 @@ defmodule Mopidy.Mixfile do
   defp deps do
     [
       {:credo, "~> 0.4", only: [:dev, :test]},
-      {:earmark, "~> 0.1", only: :docs},
-      {:ex_doc, "~> 0.11", only: :docs},
+      {:earmark, "~> 0.1", only: :dev},
+      {:ex_doc, "~> 0.11", only: :dev},
       {:excoveralls, "~> 0.4", only: :test},
       {:httpotion, "~> 3.0.0"},
-      {:inch_ex, "~> 0.4", only: :docs},
+      {:inch_ex, "~> 0.4", only: :dev},
       {:mix_test_watch, "~> 0.2", only: :test},
       {:poison, "~> 2.1"}
     ]
