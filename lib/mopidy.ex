@@ -97,7 +97,11 @@ defmodule Mopidy do
 
   def start(_type, _args) do
     start
-    Mopidy.Supervisor.start_link
+
+    import Supervisor.Spec, warn: false
+
+    opts = [strategy: :one_for_one, name: Mopidy.Supervisor]
+    Supervisor.start_link([], opts)
   end
 
   @doc """
