@@ -126,7 +126,7 @@ defmodule Mopidy do
   Set our request headers for every request.
   """
   def process_request_headers(headers) do
-    Dict.put headers, :"User-Agent", "Mopidy/v1 mopidy-elixir/0.0.1"
+    Dict.put headers, :"User-Agent", "Mopidy/v1 mopidy-elixir/0.2.0"
     Dict.put headers, :"Content-Type", "application/json"
   end
 
