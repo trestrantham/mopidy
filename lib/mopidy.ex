@@ -93,9 +93,15 @@ defmodule Mopidy do
   use Application
   use HTTPotion.Base
 
+  @request_timeout 5_000
+
   def start(_type, _args) do
     start
-    Mopidy.Supervisor.start_link
+
+    import Supervisor.Spec, warn: false
+
+    opts = [strategy: :one_for_one, name: Mopidy.Supervisor]
+    Supervisor.start_link([], opts)
   end
 
   @doc """
@@ -120,7 +126,7 @@ defmodule Mopidy do
   Set our request headers for every request.
   """
   def process_request_headers(headers) do
-    Dict.put headers, :"User-Agent", "Mopidy/v1 mopidy-elixir/0.0.1"
+    Dict.put headers, :"User-Agent", "Mopidy/v1 mopidy-elixir/0.2.0"
     Dict.put headers, :"Content-Type", "application/json"
   end
 
@@ -135,7 +141,7 @@ defmodule Mopidy do
   def api_request(data \\ %{}) do
     body = Map.merge(%{id: "1", jsonrpc: "2.0"}, data)
 
-    with %HTTPotion.Response{body: body} <- Mopidy.post(nil, [body: body]) do
+    with %HTTPotion.Response{body: body} <- Mopidy.post(nil, [body: body, timeout: mopidy_request_timeout]) do
       {:ok, body}
     else
       %HTTPotion.ErrorResponse{message: message} -> {:error, message}
@@ -258,5 +264,9 @@ defmodule Mopidy do
   """
   def mopidy_api_url do
     Application.get_env(:mopidy, :api_url)
+  end
+
+  def mopidy_request_timeout do
+    Application.get_env(:mopidy, :request_timeout) || @request_timeout
   end
 end

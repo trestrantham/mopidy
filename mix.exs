@@ -4,11 +4,13 @@ defmodule Mopidy.Mixfile do
   def project do
     [
       app: :mopidy,
-      version: "0.1.0",
+      version: "0.2.0",
       elixir: ">= 1.3.0-rc.1",
       deps: deps,
       description: description,
       package: package,
+      build_embedded: Mix.env == :prod,
+      start_permanent: Mix.env == :prod,
       test_coverage: [tool: ExCoveralls],
       preferred_cli_env: [
         "coveralls": :test,

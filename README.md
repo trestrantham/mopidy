@@ -8,7 +8,7 @@ Add mopidy to your list of dependencies in `mix.exs`:
 
 ```elixir
 def deps do
-  [{:mopidy, "~> 0.1.0"}]
+  [{:mopidy, "~> 0.2.0"}]
 end
 ```
 
