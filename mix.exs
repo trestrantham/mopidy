@@ -4,8 +4,8 @@ defmodule Mopidy.Mixfile do
   def project do
     [
       app: :mopidy,
-      version: "0.2.0",
-      elixir: ">= 1.3.0-rc.1",
+      version: "0.3.0",
+      elixir: ">= 1.3.0",
       deps: deps,
       description: description,
       package: package,
@@ -33,6 +33,7 @@ defmodule Mopidy.Mixfile do
   defp deps do
     [
       {:credo, "~> 0.4", only: [:dev, :test]},
+      {:dogma, "~> 0.1", only: :dev},
       {:earmark, "~> 0.1", only: :dev},
       {:ex_doc, "~> 0.11", only: :dev},
       {:excoveralls, "~> 0.4", only: :test},

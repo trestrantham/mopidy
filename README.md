@@ -36,7 +36,7 @@ The online [documentation][doc] for the Mopidy HTTP API will give you a general
 idea of the modules and available functionality. Where possible the namespacing
 has been matched.
 
-```shell
+```elixir
 iex> {:ok, search_results} = Mopidy.Library.search(%{artist: "radiohead"}, ["spotify:"])
 iex> search_results.artists
 [%Mopidy.Artist{__model__: "Artist",
