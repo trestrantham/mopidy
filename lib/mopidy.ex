@@ -85,6 +85,9 @@ end
 
 
 defmodule Mopidy.Websocket do
+  @moduledoc """
+  A Websocket connection to Mopidy
+  """
   defstruct connection: nil
 
   @type t :: %__MODULE__{

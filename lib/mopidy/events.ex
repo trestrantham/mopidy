@@ -1,5 +1,7 @@
-defmodule Mopidy.Events do
-
+defmodule Mopidy.Events do`
+  @moduledoc """
+    Get a stream of Mopidy events
+    """
   def create_stream do
     Stream.resource(
       fn -> Mopidy.Websocket.new end,
