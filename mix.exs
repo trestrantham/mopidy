@@ -40,7 +40,8 @@ defmodule Mopidy.Mixfile do
       {:httpotion, "~> 3.0.0"},
       {:inch_ex, "~> 0.4", only: :docs},
       {:mix_test_watch, "~> 0.2", only: :test},
-      {:poison, "~> 2.1"}
+      {:poison, "~> 3.0"},
+      {:socket, "~> 0.3"}
     ]
   end
 

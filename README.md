@@ -30,6 +30,8 @@ config :mopidy,
   api_url: System.get_env("MOPIDY_API_URL")
 ```
 
+If you want to be able to receive events via websockets you will also need to set `websocket_api_url` 
+
 ## Usage
 
 The online [documentation][doc] for the Mopidy HTTP API will give you a general
@@ -46,6 +48,24 @@ iex> search_results.artists
   uri: "spotify:artist:4Z8W4fKeB5YxbusRsdQVPb"}]
 ```
 
+To receive events:
+```elixir
+iex> Mopidy.Events.create_stream |> Enum.each(&IO.inspect/1)
+{:ok,
+ %{"event" => "playback_state_changed", "new_state" => "playing",
+   "old_state" => "paused"}}
+{:ok,
+ %{event: "track_playback_resumed", time_position: 1819,
+   tl_track: %Mopidy.TlTrack{__model__: "TlTrack", tlid: 658,
+    track: %Mopidy.Track{__model__: "Track",
+     album: %Mopidy.Album{__model__: "Album",
+      name: "It'll End In Tears (Remastered)",
+      uri: "spotify:album:6D6C7jGsJdzJpcEaMcxswR"},
+     artists: [%Mopidy.Artist{__model__: "Artist", name: "This Mortal Coil",
+       uri: "spotify:artist:5OK8j1JnhoBlivN32G7yOO"}],
+     name: "Song To The Siren (Remastered)",
+     uri: "spotify:track:0BPTTsnnfz44XmZn3EE0oo"}}}}
+```
 ## License
 
 MIT License, see [LICENSE](LICENSE) for details.

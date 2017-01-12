@@ -83,6 +83,46 @@ defmodule Mopidy.Playlist do
   }
 end
 
+
+defmodule Mopidy.Websocket do
+  defstruct connection: nil
+
+  @type t :: %__MODULE__{
+    connection: Socket.Web.t
+  }
+
+  def new do
+    %Mopidy.Websocket{connection: connect}
+  end
+
+  def receive_next_event(%Mopidy.Websocket{connection: connection} = socket) when not is_nil(connection) do
+    case Socket.Web.recv(connection) do
+      {:ok, {:text, data}} -> {[parse_event(data)], socket}
+      _ -> {:halt, socket}
+    end
+  end
+
+  def receive_next_event(%Mopidy.Websocket{connection: nil} = socket) do
+    {:halt, socket}
+  end
+
+  def parse_event(data) do
+    Mopidy.parse_data(:event, Poison.decode!(data))
+  end          
+
+  defp connect do
+    %URI{host: host, path: path, port: port} = URI.parse(mopidy_websocket_api_url)
+    case Socket.Web.connect {host, port || 80},  path: path || "" do
+      {:ok, conn} -> conn
+      _ -> nil      
+    end
+  end
+
+  defp mopidy_websocket_api_url do
+    Application.get_env(:mopidy, :websocket_api_url)
+  end
+end
+
 defmodule Mopidy do
   @moduledoc """
   An HTTP client for Mopidy
@@ -167,12 +207,40 @@ defmodule Mopidy do
   end
 
   # Entry points
+  def parse_data(:event, %{"event" => event} = body), do: {:ok, parse_data(event, body)}
   def parse_data(_data_type, %{"error" => _error} = body), do: {:error, body}
   def parse_data(:success, _body), do: {:ok, :success}
   def parse_data(:value, body), do: {:ok, body["value"]}
   def parse_data(:result, body), do: {:ok, body["result"]}
   def parse_data(:uri, body), do: {:ok, parse_data(:uri, body["result"], %{})}
-  def parse_data(data_type, body), do: {:ok, parse_data(data_type, body["result"], [])}
+  def parse_data(data_type, %{result: result}), do: {:ok, parse_data(data_type, result, [])}
+
+  # Event parsing
+  def parse_data(event, datum_data) when event in ~w(track_playback_resumed track_playback_paused track_playback_ended) do
+    %{
+      event: event,
+      time_position: datum_data["time_position"],
+      tl_track: parse_data(%TlTrack{}, datum_data["tl_track"], %{})
+    }
+  end
+
+def parse_data("track_playback_started" = event, datum_data)  do
+    %{
+      event: event,
+      tl_track: parse_data(%TlTrack{}, datum_data["tl_track"], %{})
+    }
+  end  
+
+  def parse_data("playlist_changed" = event, datum_data) do
+    %{
+      event: event,
+      playlist: parse_data(%Playlist{}, datum_data["playlist"], %{})
+    }
+  end
+
+  def parse_data(_, %{"event" => event} = datum_data) do
+    datum_data
+  end
 
   # List parsing
   def parse_data(_data_type, nil, _accumulator), do: nil
