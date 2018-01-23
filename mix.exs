@@ -6,9 +6,9 @@ defmodule Mopidy.Mixfile do
       app: :mopidy,
       version: "0.3.0",
       elixir: ">= 1.3.0",
-      deps: deps,
-      description: description,
-      package: package,
+      deps: deps(),
+      description: description(),
+      package: package(),
       build_embedded: Mix.env == :prod,
       start_permanent: Mix.env == :prod,
       test_coverage: [tool: ExCoveralls],
@@ -34,13 +34,13 @@ defmodule Mopidy.Mixfile do
     [
       {:credo, "~> 0.4", only: [:dev, :test]},
       {:dogma, "~> 0.1", only: :dev},
-      {:earmark, "~> 0.1", only: :dev},
+      {:earmark, "~> 1.2", only: :dev},
       {:ex_doc, "~> 0.11", only: :dev},
       {:excoveralls, "~> 0.4", only: :test},
-      {:httpotion, "~> 3.0.0"},
-      {:inch_ex, "~> 0.4", only: :docs},
+      {:httpotion, "~> 3.0"},
       {:mix_test_watch, "~> 0.2", only: :test},
-      {:poison, "~> 2.1"}
+      {:poison, "~> 3.1"},
+      {:socket, "~> 0.3"}
     ]
   end
 

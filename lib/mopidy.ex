@@ -83,6 +83,49 @@ defmodule Mopidy.Playlist do
   }
 end
 
+
+defmodule Mopidy.Websocket do
+  @moduledoc """
+  A Websocket connection to Mopidy
+  """
+  defstruct connection: nil
+
+  @type t :: %__MODULE__{
+    connection: Socket.Web.t
+  }
+
+  def new do
+    %Mopidy.Websocket{connection: connect()}
+  end
+
+  def receive_next_event(%Mopidy.Websocket{connection: connection} = socket) when not is_nil(connection) do
+    case Socket.Web.recv(connection) do
+      {:ok, {:text, data}} -> {[parse_event(data)], socket}
+      _ -> {:halt, socket}
+    end
+  end
+
+  def receive_next_event(%Mopidy.Websocket{connection: nil} = socket) do
+    {:halt, socket}
+  end
+
+  def parse_event(data) do
+    Mopidy.Events.parse_event(Poison.decode!(data))
+  end
+
+  defp connect do
+    %URI{host: host, path: path, port: port} = URI.parse(mopidy_websocket_api_url())
+    case Socket.Web.connect {host, port || 80},  path: path || "" do
+      {:ok, conn} -> conn
+      _ -> nil
+    end
+  end
+
+  defp mopidy_websocket_api_url do
+    Application.get_env(:mopidy, :websocket_api_url)
+  end
+end
+
 defmodule Mopidy do
   @moduledoc """
   An HTTP client for Mopidy
@@ -96,7 +139,7 @@ defmodule Mopidy do
   @request_timeout 5_000
 
   def start(_type, _args) do
-    start
+    start()
 
     import Supervisor.Spec, warn: false
 
@@ -111,7 +154,7 @@ defmodule Mopidy do
   Returns string
   """
   def process_url(endpoint) do
-    mopidy_api_url <> endpoint
+    mopidy_api_url() <> endpoint
   end
 
   def process_request_body(body) do
@@ -126,8 +169,8 @@ defmodule Mopidy do
   Set our request headers for every request.
   """
   def process_request_headers(headers) do
-    Dict.put headers, :"User-Agent", "Mopidy/v1 mopidy-elixir/0.2.0"
-    Dict.put headers, :"Content-Type", "application/json"
+    Keyword.put headers, :"User-Agent", "Mopidy/v1 mopidy-elixir/0.2.0"
+    Keyword.put headers, :"Content-Type", "application/json"
   end
 
   @doc """
@@ -141,7 +184,7 @@ defmodule Mopidy do
   def api_request(data \\ %{}) do
     body = Map.merge(%{id: "1", jsonrpc: "2.0"}, data)
 
-    with %HTTPotion.Response{body: body} <- Mopidy.post(nil, [body: body, timeout: mopidy_request_timeout]) do
+    with %HTTPotion.Response{body: body} <- Mopidy.post(nil, [body: body, timeout: mopidy_request_timeout()]) do
       {:ok, body}
     else
       %HTTPotion.ErrorResponse{message: message} -> {:error, message}
@@ -172,7 +215,7 @@ defmodule Mopidy do
   def parse_data(:value, body), do: {:ok, body["value"]}
   def parse_data(:result, body), do: {:ok, body["result"]}
   def parse_data(:uri, body), do: {:ok, parse_data(:uri, body["result"], %{})}
-  def parse_data(data_type, body), do: {:ok, parse_data(data_type, body["result"], [])}
+  def parse_data(data_type, body), do: {:ok, parse_data(data_type, body["result"], [])}   
 
   # List parsing
   def parse_data(_data_type, nil, _accumulator), do: nil
