@@ -96,7 +96,7 @@ defmodule Mopidy do
   @request_timeout 5_000
 
   def start(_type, _args) do
-    start
+    start()
 
     import Supervisor.Spec, warn: false
 
@@ -111,7 +111,7 @@ defmodule Mopidy do
   Returns string
   """
   def process_url(endpoint) do
-    mopidy_api_url <> endpoint
+    mopidy_api_url() <> endpoint
   end
 
   def process_request_body(body) do
@@ -126,8 +126,8 @@ defmodule Mopidy do
   Set our request headers for every request.
   """
   def process_request_headers(headers) do
-    Dict.put headers, :"User-Agent", "Mopidy/v1 mopidy-elixir/0.2.0"
-    Dict.put headers, :"Content-Type", "application/json"
+    Keyword.put headers, :"User-Agent", "Mopidy/v1 mopidy-elixir/0.2.0"
+    Keyword.put headers, :"Content-Type", "application/json"
   end
 
   @doc """
@@ -141,7 +141,7 @@ defmodule Mopidy do
   def api_request(data \\ %{}) do
     body = Map.merge(%{id: "1", jsonrpc: "2.0"}, data)
 
-    with %HTTPotion.Response{body: body} <- Mopidy.post(nil, [body: body, timeout: mopidy_request_timeout]) do
+    with %HTTPotion.Response{body: body} <- Mopidy.post(nil, [body: body, timeout: mopidy_request_timeout()]) do
       {:ok, body}
     else
       %HTTPotion.ErrorResponse{message: message} -> {:error, message}
